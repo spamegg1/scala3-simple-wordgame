@@ -1,4 +1,4 @@
 target/
-project/
+project/target/
 .idea/
 .bsp/
