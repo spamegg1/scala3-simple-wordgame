@@ -1,4 +1,4 @@
-import io.{BufferedSource}
+import io.BufferedSource
 import io.Source.fromResource             // this can "see" the resources folder
 import io.StdIn.readLine
 import util.Random.between
