@@ -66,27 +66,3 @@ class IsValidWord:
       'r' -> 2, 'a' -> 1, 'p' -> 1, 't' -> 1, 'u' -> 1, 'e' -> 1
     )
     assertEquals(isValidWord(word4, hand4, wordList), true)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
