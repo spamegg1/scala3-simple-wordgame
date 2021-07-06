@@ -77,3 +77,9 @@ These are for Windows; Linux and MacOS should be similar/easier.
 17. Type `run` to play the game!
 
   ![17](images/17.png) 
+
+### TODO:
+
+Need to wrap the interactive portions of the game using the `IO` Monad. (`scalaz` or `cats` maybe?)
+
+Also try to get rid of `var`, mutation, and replace `while` loops with recursion if possible.
