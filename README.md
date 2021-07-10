@@ -82,4 +82,6 @@ These are for Windows; Linux and MacOS should be similar/easier.
 
 Need to wrap the interactive portions of the game using the `IO` Monad. (`scalaz` or `cats` maybe?)
 
-Also try to get rid of `var`, mutation, and replace `while` loops with recursion if possible.
+Try to get rid of `var`, mutation, and replace `while` loops with recursion if possible.
+
+Handle file operations with `Using` so that even in case of failure the file gets closed (similar to Python's `with ... as ...` syntax).
