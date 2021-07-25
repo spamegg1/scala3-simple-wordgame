@@ -41,7 +41,7 @@ def loadWords(filename: String): Words =
  *         e.g. Map('h' -> 1, 'e' -> 1, 'l' -> 2, 'o' -> 1)
  */
 def getFreqMap(word: String): Hand =
-  word.groupBy(identity).view.mapValues(_.size).toMap
+  word.groupBy(identity).view.mapValues(_.length).toMap
 
 
 /**
@@ -54,7 +54,7 @@ def getFreqMap(word: String): Hand =
  */
 def getWordScore(word: String, num: Int): Int =
   val letterScores: Int = (for letter <- word yield SCRABBLE(letter)).sum
-  letterScores * word.size + (if word.size == num then BONUS else 0)
+  letterScores * word.length + (if word.length == num then BONUS else 0)
 
 
 /**
@@ -63,7 +63,8 @@ def getWordScore(word: String, num: Int): Int =
  */
 def displayHand(hand: Hand): Unit =
   val letters: Iterable[String] =
-    for (letter, count) <- hand yield f"$letter " * count
+    for (letter, count) <- hand
+    yield f"$letter " * count
   println(f"Current hand: ${letters.mkString}")
 
 
