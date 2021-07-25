@@ -8,5 +8,9 @@ lazy val root = project
 
     scalaVersion := scala3Version,
 
-    libraryDependencies += "com.novocode" % "junit-interface" % "0.11" % "test"
+    libraryDependencies ++= Seq(
+      "com.novocode" % "junit-interface" % "0.11" % "test",
+      ("org.typelevel" %% "cats-core" % "2.3.0").cross(CrossVersion.for3Use2_13),
+      ("org.typelevel" %% "cats-effect" % "3.1.1").cross(CrossVersion.for3Use2_13)
+    )
   )

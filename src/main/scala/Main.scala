@@ -3,6 +3,7 @@ import io.Source.fromResource             // this can "see" the resources folder
 import io.StdIn.readLine
 import util.Random.between
 import util.control.Breaks._
+import cats.effect.*
 
 type Hand = Map[Char, Int]
 type Words = List[String]
@@ -174,7 +175,8 @@ def playGame(words: Words, handSize: Int, vowelRatio: Int): Unit =
       println("Invalid command.")
 
 
-@main def hello: Unit =
-  val WORDS: Words = loadWords(FILENAME)
-  playGame(WORDS, HANDSIZE, VOWELRATIO)
-  println("I was compiled with Scala 3 :)")
+object Main extends IOApp.Simple:
+  val run =
+    for
+      _ <- IO(playGame(loadWords(FILENAME), HANDSIZE, VOWELRATIO))
+    yield ()
