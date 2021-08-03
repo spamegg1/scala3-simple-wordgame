@@ -18,8 +18,7 @@ val SCRABBLE: Hand = Map(
   'a' -> 1, 'b' -> 3, 'c' -> 3, 'd' -> 2, 'e' -> 1, 'f' -> 4, 'g' -> 2,
   'h' -> 4, 'i' -> 1, 'j' -> 8, 'k' -> 5, 'l' -> 1, 'm' -> 3, 'n' -> 1,
   'o' -> 1, 'p' -> 3, 'q' -> 10, 'r' -> 1, 's' -> 1, 't' -> 1, 'u' -> 1,
-  'v' -> 4, 'w' -> 4, 'x' -> 8, 'y' -> 4, 'z' -> 10
-)
+  'v' -> 4, 'w' -> 4, 'x' -> 8, 'y' -> 4, 'z' -> 10)
 
 
 /**
@@ -40,8 +39,10 @@ def loadWords(filename: String): Words =
  * @return map of char -> int pairs indicating how many times a letter occurs
  *         e.g. Map('h' -> 1, 'e' -> 1, 'l' -> 2, 'o' -> 1)
  */
-def getFreqMap(word: String): Hand =
-  word.groupBy(identity).view.mapValues(_.length).toMap
+def getFreqMap(word: String): Hand = word
+  .groupBy(identity)
+  .view.mapValues(_.length)
+  .toMap
 
 
 /**
@@ -75,7 +76,8 @@ def displayHand(hand: Hand): Unit =
  */
 def dealHand(handSize: Int, numVowels: Int): Hand =
   val vowels: Iterable[Char] =
-    for _ <- 1 to numVowels yield VOWELS(between(0, VOWELS.size))
+    for _ <- 1 to numVowels
+    yield VOWELS(between(0, VOWELS.size))
 
   val consonants: Iterable[Char] =
     for _ <- numVowels + 1 to handSize
@@ -94,8 +96,7 @@ def updateHand(hand: Hand, word: String): Hand =
   val handFromWord: Hand = getFreqMap(word)
   hand.map((letter, count) => handFromWord.get(letter) match
     case Some(num) => (letter, count - num)
-    case None => (letter, count)
-  )
+    case None => (letter, count))
 
 
 /**
@@ -107,9 +108,8 @@ def updateHand(hand: Hand, word: String): Hand =
 def isValidWord(word: String, hand: Hand, wordList: Words): Boolean =
   val wordHand: Hand = getFreqMap(word)
   val wordIsInHand: Boolean = word.forall(char =>
-    hand.contains(char) && wordHand(char) <= hand(char)
-  )
-  wordList.contains(word.toUpperCase) && wordIsInHand
+    hand.contains(char) && wordHand(char) <= hand(char))
+  wordIsInHand && wordList.contains(word.toUpperCase)
 
 
 /**
@@ -146,6 +146,38 @@ def playHand(hand: Hand, words: Words, num: Int): Unit =
 
 
 /**
+ * @param hand a Map of char, int pairs. Hand of letters to play.
+ * @param words the dictionary to look up valid words.
+ * @param num hand size. Needed to calculate score.
+ *            Loopless, var-less, recursive version of playHand.
+ *            Still has side effects unwrapped in IO.
+ */
+def playHand2(hand: Hand, words: Words, num: Int): Unit =
+  def helper(score: Int, currentHand: Hand): Unit =
+    if currentHand.values.sum == 0 then
+      println(f"Ran out of letters. Total score: $score points.")
+    else
+      displayHand(currentHand)
+      val word: String = readLine("Enter a word, or a . to indicate you are finished: ")
+
+      if word == "." then
+        println(f"Goodbye! Total score: $score points.")
+
+      else if !isValidWord(word, hand, words) then
+        println("Invalid word, please try again.")
+        helper(score, currentHand)
+
+      else
+        val wordScore: Int = getWordScore(word, num)
+        val newScore: Int = score + wordScore
+        val newHand: Hand = updateHand(currentHand, word)
+        println(f"$word earned $wordScore points. Total: $newScore points.")
+        helper(newScore, newHand)
+
+  helper(0, hand)
+
+
+/**
  * @param words list of strings, a dictionary to look up words.
  * @param handSize integer, the number of letters in a hand
  * @param vowelRatio divide handSize by this to find how many should be vowels.
@@ -176,8 +208,50 @@ def playGame(words: Words, handSize: Int, vowelRatio: Int): Unit =
       println("Invalid command.")
 
 
+/**
+ * @param words list of strings, a dictionary to look up words.
+ * @param handSize integer, the number of letters in a hand
+ * @param vowelRatio divide handSize by this to find how many should be vowels.
+ *                   Loopless, var-less, recursive version of playGame.
+ *                   Still has side effects unwrapped in IO.
+ */
+def playGame2(words: Words, handSize: Int, vowelRatio: Int): Unit =
+  def helper(command: String, lastHand: Hand): String =
+    if command == "r" && lastHand.isEmpty then
+      println("You have not played a hand yet. Please play a new hand first!")
+      val newCommand: String =
+        readLine("Enter n to deal a new hand, r to replay last hand, or e to end the game: ")
+      helper(newCommand, lastHand)
+    else command
+
+  def helper2(lastHand: Hand): Unit =
+    val firstCommand: String =
+      readLine("Enter n to deal a new hand, r to replay last hand, or e to end the game: ")
+    val command: String = helper(firstCommand, lastHand)
+    if command == "n" then
+      val newHand = dealHand(handSize, handSize / vowelRatio)
+      playHand2(newHand, words, handSize)
+      helper2(newHand)
+    if command == "r" then
+      playHand2(lastHand, words, handSize)
+      helper2(lastHand)
+    if command == "e" then
+      ()
+    if !List("e", "n", "r").contains(command) then
+      println("Invalid command.")
+      helper2(lastHand)
+
+  helper2(Map())
+
+
 object Main extends IOApp.Simple:
-  val run =
+  val run: IO[Unit] =
+//    for
+//      _ <- IO(println("Welcome to Scala! What's your name?"))
+//      name <- IO(readLine)
+//      nameUC = name.toUpperCase
+//      _ <- IO(println(s"Well hello, $nameUC!"))
+//    yield ()
     for
-      _ <- IO(playGame(loadWords(FILENAME), HANDSIZE, VOWELRATIO))
+      _ <- IO(playGame2(loadWords(FILENAME), HANDSIZE, VOWELRATIO))
     yield ()
