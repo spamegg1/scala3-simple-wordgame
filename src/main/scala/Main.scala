@@ -246,12 +246,6 @@ def playGame2(words: Words, handSize: Int, vowelRatio: Int): Unit =
 
 object Main extends IOApp.Simple:
   val run: IO[Unit] =
-//    for
-//      _ <- IO(println("Welcome to Scala! What's your name?"))
-//      name <- IO(readLine)
-//      nameUC = name.toUpperCase
-//      _ <- IO(println(s"Well hello, $nameUC!"))
-//    yield ()
     for
       _ <- IO(playGame2(loadWords(FILENAME), HANDSIZE, VOWELRATIO))
     yield ()
